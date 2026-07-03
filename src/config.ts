@@ -20,4 +20,11 @@ export const CONFIG = {
 
   // Subtle zoom range for the Ken Burns movement on B-roll images.
   kenBurnsMaxScale: 1.12,
+
+  // Motion-graphic scenes (stats, lists) - rendered typography instead of
+  // fake AI text images.
+  graphic: {
+    accent: '#E8A33D', // warm amber, fits the homestead look
+    background: 'linear-gradient(140deg, #171a14 0%, #24211a 55%, #1a170f 100%)',
+  },
 };

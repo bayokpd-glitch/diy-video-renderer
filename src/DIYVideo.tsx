@@ -8,10 +8,19 @@ import {
 } from 'remotion';
 import {AvatarBubble} from './AvatarBubble';
 import {CONFIG} from './config';
+import {GraphicOverlay} from './GraphicOverlay';
 import {KenBurnsImage} from './KenBurnsImage';
 import {Subtitles} from './Subtitles';
 import {TRANSITION_FRAMES, TransitionWrapper} from './TransitionWrapper';
-import type {Timeline} from './types';
+import type {Scene, Timeline} from './types';
+
+// Scenes that draw something over the fullscreen avatar.
+const hasOverlay = (scene: Scene | undefined): boolean =>
+  Boolean(
+    scene &&
+      ((scene.type === 'image' && scene.image) ||
+        (scene.type === 'graphic' && scene.graphic)),
+  );
 
 /**
  * Layer order (bottom -> top):
@@ -59,9 +68,9 @@ export const DIYVideo: React.FC<{timeline: Timeline}> = ({timeline}) => {
         />
       </AbsoluteFill>
 
-      {/* Middle layer: B-roll overlays, one Sequence per image scene */}
+      {/* Middle layer: overlays, one Sequence per image/graphic scene */}
       {timeline.scenes.map((scene, i) => {
-        if (scene.type !== 'image' || !scene.image) return null;
+        if (!hasOverlay(scene)) return null;
 
         // Start the fade-in early so the previous visual is still on screen
         // underneath while this one eases in.
@@ -73,9 +82,8 @@ export const DIYVideo: React.FC<{timeline: Timeline}> = ({timeline}) => {
         const duration = Math.max(1, endFrame - startFrame);
 
         // Fade out only when handing back to the fullscreen avatar (or at
-        // the very end). Between two images the next overlay covers this one.
-        const fadeOutAtEnd =
-          !nextScene || nextScene.type !== 'image' || !nextScene.image;
+        // the very end). Between two overlays the next one covers this one.
+        const fadeOutAtEnd = !hasOverlay(nextScene);
 
         return (
           <Sequence
@@ -85,7 +93,11 @@ export const DIYVideo: React.FC<{timeline: Timeline}> = ({timeline}) => {
             premountFor={2 * fps}
           >
             <TransitionWrapper fadeOutAtEnd={fadeOutAtEnd}>
-              <KenBurnsImage src={staticFile(scene.image)} sceneIndex={i} />
+              {scene.type === 'image' && scene.image ? (
+                <KenBurnsImage src={staticFile(scene.image)} sceneIndex={i} />
+              ) : scene.graphic ? (
+                <GraphicOverlay graphic={scene.graphic} />
+              ) : null}
               {CONFIG.showAvatarBubble ? (
                 <AvatarBubble src={staticFile('avatar.mp4')} trimBefore={startFrame} />
               ) : null}
