@@ -117,7 +117,10 @@ jobs:
                   sys.exit(f"❌ {asset_name} -> timeline.json does not contain a durationInSeconds field")
 
               fps = int(timeline.get('fps', 30))
-              total_frames = math.ceil(float(timeline['durationInSeconds']) * fps)
+              # Must match Root.tsx exactly: Math.round(durationInSeconds * FPS).
+              # ceil() here would claim one frame more than the composition has
+              # and the last chunk would fail with an out-of-range frame error.
+              total_frames = int(float(timeline['durationInSeconds']) * fps + 0.5)
               frames_per_worker = max(1, (total_frames + num_workers - 1) // num_workers)
 
               videos.append({

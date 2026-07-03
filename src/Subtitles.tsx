@@ -5,6 +5,7 @@ import type {WhisperWord} from './types';
 
 const {fontFamily} = loadFont('normal', {
   weights: ['600'],
+  subsets: ['latin'],
 });
 
 // Phrase chunking limits - tuned for readability.

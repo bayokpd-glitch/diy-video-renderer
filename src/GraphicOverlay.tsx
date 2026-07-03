@@ -11,7 +11,10 @@ import {loadFont} from '@remotion/google-fonts/Inter';
 import {CONFIG} from './config';
 import type {GraphicData} from './types';
 
-const {fontFamily} = loadFont('normal', {weights: ['500', '700', '900']});
+const {fontFamily} = loadFont('normal', {
+  weights: ['500', '700', '900'],
+  subsets: ['latin'],
+});
 
 const EASE = Easing.bezier(0.4, 0, 0.2, 1);
 
